@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class StartDialogue : MonoBehaviour {
 
-    public UIController Hud;
     public List<string> Dialogues;
     private bool hasTalked;
     private int DialogueIndex = 0;
@@ -30,7 +29,7 @@ public class StartDialogue : MonoBehaviour {
     public void ShowNextDialogue()
     {
         bool isConversationOver = DialogueIndex == Dialogues.Count - 1;
-        Hud.ShowDialogue(Dialogues[DialogueIndex], isConversationOver, this);
+        UIController.Instance.ShowDialogue(Dialogues[DialogueIndex], isConversationOver, this);
         hasTalked = true;
         DialogueIndex = DialogueIndex + 1;
     }
