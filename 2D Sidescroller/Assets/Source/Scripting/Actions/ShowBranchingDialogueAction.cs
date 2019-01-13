@@ -1,13 +1,17 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 [Serializable]
 public class DialogueOption
 {
     public string OptionText;
     public CustomAction OnSelected;
+
+    public DialogueOption(string optionTxt, CustomAction onSelected)
+    {
+        OptionText = optionTxt;
+        OnSelected = onSelected;
+    }
 }
 
 public class ShowBranchingDialogueAction : CustomAction
@@ -17,6 +21,6 @@ public class ShowBranchingDialogueAction : CustomAction
 
     public override void Initiate()
     {
-        
+        Service.Ui.ShowBranchingDialogue(Prompt, Options);
     }
 }

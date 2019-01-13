@@ -23,4 +23,12 @@
             return TimerService.Instance;
         }
     }
+
+    public static PlayerData PlayerData
+    {
+        get
+        {
+            return PlayerData.Instance;
+        }
+    }
 }

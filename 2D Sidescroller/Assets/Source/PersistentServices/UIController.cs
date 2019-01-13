@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +18,10 @@ public class UIController : MonoBehaviour
     public Button DismissButton;
     public PlayerControls Player;
 
+    public List<Button> OptionButtons;
+    public List<Text> OptionButtonTexts;
+    private List<DialogueOption> currentOptions;
+
     public GameObject PromptPanel;
     public Text PromptText;
 
@@ -29,6 +34,11 @@ public class UIController : MonoBehaviour
     }
     void Start ()
     {
+        for (int i = 0, count = OptionButtons.Count; i < count; ++i)
+        {
+            OptionButtons[i].onClick.AddListener(() => { int index = i;  DialogueBranchSelected(index); });
+        }
+
         DismissButton.onClick.AddListener(HideDialogue);
         Instance = this;
 	}
@@ -52,7 +62,36 @@ public class UIController : MonoBehaviour
         PromptPanel.SetActive(false);
     }
 
-    public void ShowDialogue(string dialogueContent, bool isConversationOver, Action onComplete)
+    public void ShowBranchingDialogue(string prompt, List<DialogueOption> options)
+    {
+        CurrentState = HudState.BranchDialogue;
+        DialoguePanel.SetActive(true);
+        currentOptions = options;
+        int numOptsButtons = OptionButtons.Count;
+        int numOptions = Math.Min(options.Count, numOptsButtons);
+        for (int i = 0; i < numOptions; ++i)
+        {
+            OptionButtons[i].gameObject.SetActive(true);
+            OptionButtonTexts[i].text = options[i].OptionText;
+        }
+    }
+
+    private void DialogueBranchSelected(int index)
+    {
+        Debug.Log("Option " + index + " selected.");
+        for (int i = 0, count = OptionButtons.Count; i < count; ++i)
+        {
+            OptionButtons[i].gameObject.SetActive(false);
+        }
+        DialoguePanel.SetActive(false);
+        if (currentOptions[index].OnSelected != null)
+        {
+            currentOptions[index].OnSelected.Initiate();
+        }
+        currentOptions = null;
+    }
+
+    public void ShowLinearDialogue(string dialogueContent, bool isConversationOver, Action onComplete)
     {
         CurrentState = HudState.LinearDialogue;
         DialogueText.text = dialogueContent;
