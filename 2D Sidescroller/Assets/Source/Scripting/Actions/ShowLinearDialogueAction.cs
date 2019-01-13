@@ -1,14 +1,31 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class ShowLinearDialogueAction : CustomAction
 {
     public List<string> Dialogues;
     public CustomAction OnComplete;
+    private int dialogueIndex;
 
     public override void Initiate()
     {
+        dialogueIndex = 0;
+        ShowNextDialogue();
+    }
 
+    private void ShowNextDialogue()
+    {
+        bool isConversationOver = dialogueIndex == Dialogues.Count - 1;
+        Action onComplete = null;
+        if (!isConversationOver)
+        {
+            onComplete = ShowNextDialogue;
+        }
+        else if (OnComplete != null)
+        {
+            onComplete = OnComplete.Initiate;
+        }
+        Service.Ui.ShowDialogue(Dialogues[dialogueIndex], isConversationOver, onComplete);
+        dialogueIndex++;
     }
 }

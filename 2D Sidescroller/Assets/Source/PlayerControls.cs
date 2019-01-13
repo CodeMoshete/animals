@@ -9,8 +9,9 @@ public class PlayerControls : MonoBehaviour {
     public bool IsTalking = false;
 
 	// Use this for initialization
-	void Start () {
-		
+	void Start ()
+    {
+        Service.Ui.Player = this;
 	}
 
     // Update is called once per frame

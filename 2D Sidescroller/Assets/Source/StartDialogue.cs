@@ -28,9 +28,9 @@ public class StartDialogue : MonoBehaviour {
 
     public void ShowNextDialogue()
     {
-        bool isConversationOver = DialogueIndex == Dialogues.Count - 1;
-        UIController.Instance.ShowDialogue(Dialogues[DialogueIndex], isConversationOver, this);
-        hasTalked = true;
-        DialogueIndex = DialogueIndex + 1;
+        //bool isConversationOver = DialogueIndex == Dialogues.Count - 1;
+        //UIController.Instance.ShowDialogue(Dialogues[DialogueIndex], isConversationOver, this);
+        //hasTalked = true;
+        //DialogueIndex = DialogueIndex + 1;
     }
 }

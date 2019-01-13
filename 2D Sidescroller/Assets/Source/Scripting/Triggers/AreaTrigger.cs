@@ -1,49 +1,44 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(Collider2D))]
 public class AreaTrigger : MonoBehaviour
 {
-	[System.Serializable]
-	public struct TriggerCustomActionParams
-	{
-		public GameObject Parent;
-	}
+    public bool DisableEnterActionsOnUse;
+    public List<CustomAction> EnterActions;
 
-    public bool DisableOnUse;
-	public List<TriggerCustomActionParams> EnterActions;
-    public List<TriggerCustomActionParams> ExitActions;
+    public bool DisableExitActionsOnUse;
+    public List<CustomAction> ExitActions;
+
     private bool isEnterUsed;
     private bool isExitUsed;
 
     public void OnTriggerEnter2D(Collider2D collisionObject)
     {
-        if (DisableOnUse && isEnterUsed)
+        if (DisableEnterActionsOnUse && isEnterUsed)
             return;
 
-		print ("Collision Detected enter");
-		if(collisionObject.tag == "Player")
+		if(collisionObject.gameObject.layer == LayerMask.NameToLayer("Player"))
 		{
 			for(int i = 0, count = EnterActions.Count; i < count; i++)
 			{
                 isEnterUsed = true;
-				EnterActions[i].Parent.GetComponent<CustomAction>().Initiate();
+				EnterActions[i].Initiate();
 			}
 		}
 	}
 
     public void OnTriggerExit2D(Collider2D other)
     {
-        if (DisableOnUse && isExitUsed)
+        if (DisableExitActionsOnUse && isExitUsed)
             return;
 
-        print("Collision Detected exit");
-        if (other.tag == "Player")
+        if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
             for (int i = 0, count = ExitActions.Count; i < count; i++)
             {
                 isExitUsed = true;
-                ExitActions[i].Parent.GetComponent<CustomAction>().Initiate();
+                ExitActions[i].Initiate();
             }
         }
     }

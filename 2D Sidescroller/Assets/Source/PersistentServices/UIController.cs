@@ -2,34 +2,37 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum HudState
+{
+    Idle,
+    LinearDialogue,
+    BranchDialogue,
+    Transition
+}
+
 public class UIController : MonoBehaviour
 {
-    private enum HudState
-    {
-        Idle,
-        LinearDialogue,
-        BranchDialogue,
-        Transition
-    }
-
     public GameObject DialoguePanel;
     public Text DialogueText;
     public Button DismissButton;
     public PlayerControls Player;
+
+    public GameObject PromptPanel;
+    public Text PromptText;
+
+    public HudState CurrentState { get; private set; }
 
     private bool isConvoOver;
     private Action OnComplete;
 
     public static UIController Instance { get; private set;
     }
-    // Use this for initialization
-    void Start () {
-        DontDestroyOnLoad(this.gameObject);
+    void Start ()
+    {
         DismissButton.onClick.AddListener(HideDialogue);
         Instance = this;
 	}
 	
-	// Update is called once per frame
 	void Update ()
     {
          if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
@@ -38,8 +41,20 @@ public class UIController : MonoBehaviour
         }
     }
 
+    public void ShowPrompt(string promptContent)
+    {
+        PromptPanel.SetActive(true);
+        PromptText.text = promptContent;
+    }
+
+    public void HidePrompt()
+    {
+        PromptPanel.SetActive(false);
+    }
+
     public void ShowDialogue(string dialogueContent, bool isConversationOver, Action onComplete)
     {
+        CurrentState = HudState.LinearDialogue;
         DialogueText.text = dialogueContent;
         DialoguePanel.SetActive(true);
         Player.IsTalking = true;
@@ -52,14 +67,26 @@ public class UIController : MonoBehaviour
     {
         if (isConvoOver)
         {
+            Service.Timers.CreateTimer(0f, ResetCurrentState, null);
             Player.IsTalking = false;
             DialoguePanel.SetActive(false);
             isConvoOver = false;
+
+            if (OnComplete != null)
+            {
+                OnComplete();
+            }
+
             OnComplete = null;
         }
         else if (OnComplete != null)
         {
             OnComplete();
         }
+    }
+
+    private void ResetCurrentState(object cookie)
+    {
+        CurrentState = HudState.Idle;
     }
 }
