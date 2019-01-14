@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerData : MonoBehaviour
 {
-    private const string PLAYER_DATA_FILE = "./playerdata.txt";
+    public const string PLAYER_DATA_FILE = "./playerdata.txt";
 
     private Dictionary<string, int> PlayerStats;
 
@@ -53,7 +53,8 @@ public class PlayerData : MonoBehaviour
     {
         if (!File.Exists(PLAYER_DATA_FILE))
         {
-            File.Create(PLAYER_DATA_FILE);
+            FileStream createStream = File.Create(PLAYER_DATA_FILE);
+            createStream.Close();
         }
 
         StreamWriter stream = new StreamWriter(PLAYER_DATA_FILE, false);

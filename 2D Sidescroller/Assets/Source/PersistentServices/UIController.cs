@@ -36,16 +36,20 @@ public class UIController : MonoBehaviour
     {
         for (int i = 0, count = OptionButtons.Count; i < count; ++i)
         {
-            OptionButtons[i].onClick.AddListener(() => { int index = i;  DialogueBranchSelected(index); });
+            int curr = i;
+            OptionButtons[i].onClick.AddListener(delegate() { DialogueBranchSelected(curr); });
         }
 
         DismissButton.onClick.AddListener(HideDialogue);
         Instance = this;
 	}
 	
+
+
 	void Update ()
     {
-         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+         if ((Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space)) && 
+            CurrentState == HudState.LinearDialogue)
         {
             HideDialogue();
         }
@@ -59,6 +63,7 @@ public class UIController : MonoBehaviour
 
     public void HidePrompt()
     {
+        DismissButton.gameObject.SetActive(false);
         PromptPanel.SetActive(false);
     }
 
@@ -66,6 +71,8 @@ public class UIController : MonoBehaviour
     {
         CurrentState = HudState.BranchDialogue;
         DialoguePanel.SetActive(true);
+        DismissButton.gameObject.SetActive(false);
+        DialogueText.text = prompt;
         currentOptions = options;
         int numOptsButtons = OptionButtons.Count;
         int numOptions = Math.Min(options.Count, numOptsButtons);
@@ -78,7 +85,6 @@ public class UIController : MonoBehaviour
 
     private void DialogueBranchSelected(int index)
     {
-        Debug.Log("Option " + index + " selected.");
         for (int i = 0, count = OptionButtons.Count; i < count; ++i)
         {
             OptionButtons[i].gameObject.SetActive(false);
@@ -91,7 +97,7 @@ public class UIController : MonoBehaviour
         currentOptions = null;
     }
 
-    public void ShowLinearDialogue(string dialogueContent, bool isConversationOver, Action onComplete)
+    public void ShowLinearDialogue(string dialogueContent, bool isConversationOver, bool showDismiss, Action onComplete)
     {
         CurrentState = HudState.LinearDialogue;
         DialogueText.text = dialogueContent;
@@ -99,7 +105,7 @@ public class UIController : MonoBehaviour
         Player.IsTalking = true;
         isConvoOver = isConversationOver;
         OnComplete = onComplete;
-        DismissButton.gameObject.SetActive(isConversationOver);
+        DismissButton.gameObject.SetActive(isConversationOver && showDismiss);
     }
 
     public void HideDialogue()
@@ -115,8 +121,6 @@ public class UIController : MonoBehaviour
             {
                 OnComplete();
             }
-
-            OnComplete = null;
         }
         else if (OnComplete != null)
         {

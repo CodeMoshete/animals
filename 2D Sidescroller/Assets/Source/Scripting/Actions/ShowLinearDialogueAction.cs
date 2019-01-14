@@ -25,7 +25,11 @@ public class ShowLinearDialogueAction : CustomAction
         {
             onComplete = OnComplete.Initiate;
         }
-        Service.Ui.ShowLinearDialogue(Dialogues[dialogueIndex], isConversationOver, onComplete);
+
+        bool showDismiss = isConversationOver && 
+            !(OnComplete is ShowBranchingDialogueAction) && 
+            !(OnComplete is ShowLinearDialogueAction);
+        Service.Ui.ShowLinearDialogue(Dialogues[dialogueIndex], isConversationOver, showDismiss, onComplete);
         dialogueIndex++;
     }
 }
