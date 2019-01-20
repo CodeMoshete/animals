@@ -10,6 +10,7 @@ public class TimerService : MonoBehaviour
     {
         public float TimeLeft;
         public Action<object> Callback;
+        public Action<object> UpdateCallback;
         public object Cookie;
     }
 
@@ -27,9 +28,24 @@ public class TimerService : MonoBehaviour
         Instance = this;
     }
 
+    public void CreateTimer(
+        float duration, Action<object> onUpdate, Action<object> onComplete, object cookie)
+    {
+        TimerInstance timer = new TimerInstance
+        {
+            TimeLeft = duration,
+            Callback = onComplete,
+            UpdateCallback = onUpdate,
+            Cookie = cookie
+        };
+
+        timers.Add(timer);
+    }
+
     public void CreateTimer(float duration, Action<object> callback, object cookie)
     {
-        TimerInstance timer = new TimerInstance { TimeLeft = duration, Callback = callback, Cookie = cookie };
+        TimerInstance timer = 
+            new TimerInstance { TimeLeft = duration, Callback = callback, Cookie = cookie };
         timers.Add(timer);
     }
 
@@ -39,11 +55,16 @@ public class TimerService : MonoBehaviour
 
         for (int i = 0, count = timers.Count; i < count; ++i)
         {
-            timers[i].TimeLeft -= dt;
-            if (timers[i].TimeLeft <= 0)
+            TimerInstance timer = timers[i];
+            timer.TimeLeft -= dt;
+            if (timer.TimeLeft <= 0)
             {
-                timers[i].Callback.Invoke(timers[i].Cookie);
-                timersToRemove.Push(timers[i]);
+                timer.Callback.Invoke(timer.Cookie);
+                timersToRemove.Push(timer);
+            }
+            else if (timer.UpdateCallback != null)
+            {
+                timer.UpdateCallback(timer.Cookie);
             }
         }
 
